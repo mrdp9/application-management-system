@@ -66,4 +66,4 @@ class InMemoryConfigRepository(ConfigRepository):
 
     def list_services(self) -> Dict[str, List[str]]:
         # Returns a dict of environments and their respective services
-        return {env: list(srvs) for env, srvs in self.services.items()}
+        return {env: sorted(srvs) for env, srvs in self.services.items()}
