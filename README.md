@@ -1,1 +1,0 @@
-# application-management-system
