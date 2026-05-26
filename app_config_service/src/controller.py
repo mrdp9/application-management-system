@@ -1,6 +1,7 @@
 import copy
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
+from pydantic import ValidationError
 from .models import Configuration, FlatValue
 from .repository import ConfigRepository
 
@@ -21,13 +22,17 @@ class ConfigController:
         now = datetime.now(timezone.utc)
         
         # Creating this object automatically triggers Pydantic's validation!
-        config = Configuration(
-            service_name=service_name,
-            environment=environment,
-            data=data,
-            created_at=now,
-            updated_at=now
-        )
+        try:
+            config = Configuration(
+                service_name=service_name,
+                environment=environment,
+                data=data,
+                created_at=now,
+                updated_at=now
+            )
+        except ValidationError as exc:
+            raise ValueError(str(exc)) from exc
+
         self.repo.save_config(config)
 
     def update_config(self, service_name: str, environment: str, partial_data: Dict[str, FlatValue]) -> None:
@@ -48,14 +53,17 @@ class ConfigController:
         # 3. Create a NEW Configuration object. 
         # If Pydantic validation fails here, it raises an error BEFORE saving,
         # ensuring our atomic update requirement is perfectly met.
-        updated_config = Configuration(
-            service_name=service_name,
-            environment=environment,
-            data=new_data,
-            created_at=existing_config.created_at,  # Keep original creation time
-            updated_at=datetime.now(timezone.utc)   # Update modification time
-        )
-        
+        try:
+            updated_config = Configuration(
+                service_name=service_name,
+                environment=environment,
+                data=new_data,
+                created_at=existing_config.created_at,  # Keep original creation time
+                updated_at=datetime.now(timezone.utc)   # Update modification time
+            )
+        except ValidationError as exc:
+            raise ValueError(str(exc)) from exc
+
         # 4. Save back to the repository
         self.repo.save_config(updated_config)
 
