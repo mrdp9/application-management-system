@@ -1,0 +1,64 @@
+Test Results
+===========
+
+Full test suite:
+- 20 passed in 1.09s
+
+Repository-only tests:
+- 5 passed in 0.57s
+
+CLI command examples and outputs:
+
+1) Input:
+   add-environment staging
+   Command: python -m src.cli add-environment staging
+   Output:
+   Success: Environment 'staging' added.
+
+2) Input:
+   add-service payment-service staging
+   Command: python -m src.cli add-service payment-service staging
+   Output:
+   Success: Service 'payment-service' added to 'staging'.
+
+3) Input:
+   set-config payment-service staging timeout_seconds 30
+   Command: python -m src.cli set-config payment-service staging timeout_seconds 30
+   Output:
+   Success: Configuration set for 'payment-service' in 'staging'.
+
+4) Input:
+   update-config payment-service staging '{"timeout_seconds": 30, "retry_attempts": 3, "enable_logging": true, "max_connections": 100}'
+   Command: python -m src.cli update-config payment-service staging '{"timeout_seconds": 30, "retry_attempts": 3, "enable_logging": true, "max_connections": 100}'
+   Output:
+   Success: Configuration updated atomically for 'payment-service' in 'staging'.
+
+5) Input:
+   get-config payment-service staging
+   Command: python -m src.cli get-config payment-service staging
+   Output:
+   {
+     "service_name": "payment-service",
+     "environment": "staging",
+     "data": {
+       "timeout_seconds": 30,
+       "retry_attempts": 3,
+       "enable_logging": 1.0,
+       "max_connections": 100
+     },
+     "created_at": "<timestamp>",
+     "updated_at": "<timestamp>"
+   }
+
+6) Input:
+   list-services
+   Command: python -m src.cli list-services
+   Output:
+   Environment: staging
+     - payment-service
+
+7) Input:
+   set-config payment-service staging not-json
+   Command: python -m src.cli set-config payment-service staging not-json
+   Output:
+   Error: Invalid JSON format. Please provide a valid JSON string.

@@ -60,3 +60,18 @@ def test_update_config_invalid_partial_data_is_atomic():
         controller.update_config("payments", "dev", {"debug": {"enabled": True}})
 
     assert repo.get_config("payments", "dev").data == original_data
+
+
+def test_environment_specific_config_separation():
+    repo = InMemoryConfigRepository()
+    controller = ConfigController(repo)
+    repo.add_environment("dev")
+    repo.add_environment("staging")
+    repo.add_service("payments", "dev")
+    repo.add_service("payments", "staging")
+
+    controller.set_config("payments", "dev", {"timeout_seconds": 30})
+    controller.set_config("payments", "staging", {"timeout_seconds": 60})
+
+    assert repo.get_config("payments", "dev").data["timeout_seconds"] == 30
+    assert repo.get_config("payments", "staging").data["timeout_seconds"] == 60

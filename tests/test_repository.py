@@ -22,6 +22,15 @@ def test_add_environment_duplicate_raises_value_error():
         repo.add_environment("dev")
 
 
+def test_add_service_duplicate_raises_value_error():
+    repo = InMemoryConfigRepository()
+    repo.add_environment("dev")
+    repo.add_service("payments", "dev")
+
+    with pytest.raises(ValueError, match="already exists"):
+        repo.add_service("payments", "dev")
+
+
 def test_add_service_missing_environment_raises_value_error():
     repo = InMemoryConfigRepository()
 
